@@ -6,9 +6,11 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "rec_backend.h"
 #include "datum.h"
+#include "hdf5_back.h"
 #include "logger.h"
+#include "rec_backend.h"
+#include "sqlite_back.h"
 
 namespace cyclus {
 
@@ -70,11 +72,21 @@ void Recorder::AddDatum(Datum* d) {
 void Recorder::Flush() {
   DatumList tmp = data_;
   tmp.resize(index_);
+  std::cout << "tmpsize " << tmp.size() << " index " << index_ << "\n";
   index_ = 0;
   std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
+    //Hdf5Back* hit = dynamic_cast<Hdf5Back*>((*it));
+    //if (hit != NULL) {
+    //  std::cout << "Found hdf5 backend!\n";
+    //  hit->Notify(tmp);
+    //  hit->Flush();
+    //}
+    std::cout << "backend Notify()\n";
     (*it)->Notify(tmp);
+    std::cout << "backend Flush()\n";
     (*it)->Flush();
+    std::cout << "backend looped()\n";
   }
 }
 
@@ -82,6 +94,10 @@ void Recorder::NotifyBackends() {
   index_ = 0;
   std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
+    //Hdf5Back* hit = dynamic_cast<Hdf5Back*>((*it));
+    //if (hit != NULL) {
+    //  hit->Notify(data_);
+    //}
     (*it)->Notify(data_);
   }
 }

@@ -1,4 +1,7 @@
 #include <string>
+#include <sstream>
+
+#include <unistd.h>
 
 #include <gtest/gtest.h>
 
@@ -8,6 +11,8 @@
 #include "hdf5_hl.h"
 
 static const char* path = "testdb.h5";
+
+int CNT = 0;
 
 class FileDeleter {
  public:
@@ -47,7 +52,8 @@ TEST(Hdf5BackTest, ReadWrite) {
   string_shape[0] = 16;
   m.RegisterBackend(&back);
   m.NewDatum("DumbTitle")
-  ->AddVal("string", str, &string_shape)
+  //->AddVal("string", str, &string_shape)
+  ->AddVal("string", str, string_shape)
   ->AddVal("int", i)
   ->AddVal("float", f)
   ->AddVal("double", d)
@@ -104,25 +110,43 @@ TEST(Hdf5BackTest, ReadWrite) {
 
 template <typename T>
 cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y, 
-                                             cyclus::Datum::Shape shape = NULL) {
-  FileDeleter fd(fpath);
+                                             cyclus::Datum::Shape* shape = NULL) {
+  std::vector<int> s_;
+  if (shape == NULL)
+    shape = &s_;
+  CNT++;
+  std::stringstream ss;
+  ss << CNT << "_" << ".h5";
+  //const char * path = ss.str().c_str();
+  const char * path = fpath;
+  std::cout << "path " << path << "\n";
+  //FileDeleter fd(path);
+  cyclus::RecBackend::Deleter bdel;
   cyclus::Recorder m;
-  cyclus::Hdf5Back back(fpath);
-  m.RegisterBackend(&back);
+  //cyclus::Hdf5Back back(path);
+  //m.RegisterBackend(&back);
+  cyclus::Hdf5Back* back = new cyclus::Hdf5Back(path);
+  m.RegisterBackend(back);
+  //bdel.Add(back);
   m.NewDatum("data")
-  ->AddVal("vals", x, shape)
+  //->AddVal("vals", x, shape)
+  ->AddVal("vals", x, *shape)
   ->Record();
   m.NewDatum("data")
-  ->AddVal("vals", y, shape)
+  //->AddVal("vals", y, shape)
+  ->AddVal("vals", y, *shape)
   ->Record();
   m.Close();
-  H5garbage_collect();
-  return back.Query("data", NULL);
+  //return back.Query("data", NULL);
+  //return back->Query("data", NULL);
+  cyclus::QueryResult qr = back->Query("data", NULL);
+  delete back;
+  return qr;
 }
 
 template <typename T>
 void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y, 
-                            cyclus::Datum::Shape shape = NULL) {
+                            cyclus::Datum::Shape* shape = NULL) {
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y, shape);
   T obsx = qr.GetVal<T>("vals", 0);
   EXPECT_EQ(x, obsx);
@@ -132,7 +156,7 @@ void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y,
 
 template <>
 void Hdf5ReadWriteTestBasic<std::string>(const char* fpath, std::string x, std::string y, 
-                                         cyclus::Datum::Shape shape) {
+                                         cyclus::Datum::Shape* shape) {
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<std::string>(fpath, x, y, shape);
   std::string obsx = qr.GetVal<std::string>("vals", 0);
   EXPECT_STREQ(x.c_str(), obsx.c_str());
@@ -143,7 +167,7 @@ void Hdf5ReadWriteTestBasic<std::string>(const char* fpath, std::string x, std::
 template <>
 void Hdf5ReadWriteTestBasic<cyclus::Blob>(const char* fpath, cyclus::Blob x, 
                                           cyclus::Blob y, 
-                                          cyclus::Datum::Shape shape) {
+                                          cyclus::Datum::Shape* shape) {
   using cyclus::Blob;
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<Blob>(fpath, x, y, shape);
   Blob obsx = qr.GetVal<Blob>("vals", 0);
@@ -205,6 +229,18 @@ TEST(Hdf5BackTest, ReadWriteVectorInt) {
   int y_[] = {42, 43, 44};
   vector<int> y = vector<int>(y_, y_+3);
   Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y, &shape);
+  Hdf5ReadWriteTestBasic<vector<int> >("vector_int1.h5", x, y, &shape);
+}
+
+TEST(Hdf5BackTest, ReadWriteVectorInt1) {
+  using std::vector;
+  vector<int> shape(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  vector<int> x = vector<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  vector<int> y = vector<int>(y_, y_+3);
+  Hdf5ReadWriteTestBasic<vector<int> >("vector_int1.h5", x, y, &shape);
 }
 
 TEST(Hdf5BackTest, ReadWriteVLVectorInt) {

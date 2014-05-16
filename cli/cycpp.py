@@ -1018,7 +1018,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             if info['type'] in BUFFERS:
                 continue
-            shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            #shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            shape = ', __{0}_shape__'.format(member) if 'shape' in info else ''
             impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
         impl += ind + '->Record();\n'
         return impl
@@ -1117,7 +1118,8 @@ class SnapshotFilter(CodeGeneratorFilter):
             t = info["type"]
             if t in BUFFERS:
                 continue
-            shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            #shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            shape = ', __{0}_shape__'.format(member) if 'shape' in info else ''
             impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
         impl += ind + "->Record();\n"
 

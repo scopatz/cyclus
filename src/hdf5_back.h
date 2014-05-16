@@ -83,11 +83,13 @@ class Hdf5Back : public FullBackend {
   /// cleans up resources and closes the file.
   virtual ~Hdf5Back();
 
-  virtual void Notify(DatumList data);
+  //virtual void Notify(DatumList data);
+  void Notify(DatumList data);
 
   virtual std::string Name();
 
-  virtual inline void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
+  //virtual inline void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
+  inline void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
@@ -230,8 +232,6 @@ class Hdf5Back : public FullBackend {
   /// Map of database type to the set of current keys present in the database.
   std::map<DbTypes, std::set<Digest> > vlkeys_;
 };
-
-const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 } // namespace cyclus
 #endif

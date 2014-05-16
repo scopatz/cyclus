@@ -8,9 +8,10 @@
 
 namespace cyclus {
 
-//const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
+  H5open();
   hasher_.Clear();
   if (boost::filesystem::exists(path_))
     file_ = H5Fopen(path_.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
@@ -41,7 +42,8 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 
 Hdf5Back::~Hdf5Back() {
   // cleanup HDF5
-  Hdf5Back::Flush();
+  //Hdf5Back::Flush();
+  Flush();
   H5Fclose(file_);
   std::set<hid_t>::iterator t;
   for (t = opened_types_.begin(); t != opened_types_.end(); ++t) 
@@ -49,6 +51,8 @@ Hdf5Back::~Hdf5Back() {
   std::map<std::string, hid_t>::iterator vldsit;
   for (vldsit = vldatasets_.begin(); vldsit != vldatasets_.end(); ++vldsit)
     H5Dclose(vldsit->second);
+
+  H5close();
 
   // cleanup memory
   std::map<std::string, size_t*>::iterator it;
@@ -482,7 +486,7 @@ std::string Hdf5Back::Name() {
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
   hsize_t nvals = vals.size();
-  Datum::Shape shape;
+  Datum::Shape* shape;
   Datum::Shapes shapes = d->shapes();
 
   size_t dst_size = 0;
@@ -512,8 +516,10 @@ void Hdf5Back::CreateTable(Datum* d) {
       field_types[i] = H5T_NATIVE_DOUBLE;
       dst_sizes[i] = sizeof(double);
     } else if (valtype == typeid(std::string)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
+      //if (shape.empty() || (*shape)[0] < 1) {
         dbtypes[i] = VL_STRING;
         field_types[i] = sha1_type_;
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
@@ -534,8 +540,10 @@ void Hdf5Back::CreateTable(Datum* d) {
       field_types[i] = uuid_type_;
       dst_sizes[i] = CYCLUS_UUID_SIZE;
     } else if (valtype == typeid(std::vector<int>)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
+      //if (shape.empty() || (*shape)[0] < 1) {
         dbtypes[i] = VL_VECTOR_INT;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_VECTOR_INT) == 0) {
@@ -550,8 +558,10 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
     } else if (valtype == typeid(std::vector<std::string>)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       if (shape == NULL || ((*shape)[0] < 1 && (*shape)[1] < 1)) {
+      //if (shape.empty() || ((*shape)[0] < 1 && (*shape)[1] < 1)) {
         dbtypes[i] = VL_VECTOR_VL_STRING;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_VECTOR_VL_STRING) == 0) {
@@ -582,8 +592,10 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = (*shape)[0] * (*shape)[1];
       }
     } else if (valtype == typeid(std::set<int>)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
+      //if (shape.empty() || (*shape)[0] < 1) {
         dbtypes[i] = VL_SET_INT;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_SET_INT) == 0) {
@@ -598,8 +610,10 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
     } else if (valtype == typeid(std::list<int>)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
+      //if (shape.empty() || (*shape)[0] < 1) {
         dbtypes[i] = VL_LIST_INT;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_LIST_INT) == 0) {
@@ -621,11 +635,13 @@ void Hdf5Back::CreateTable(Datum* d) {
       H5Tinsert(field_types[i], "second", sizeof(int), H5T_NATIVE_INT);
       opened_types_.insert(field_types[i]);
     } else if (valtype == typeid(std::map<int, int>)) {
-      shape = shapes[i];
+      //shape = shapes[i];
+      shape = shapes[i].empty() ? NULL : &shapes[i];
       hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) * 2);
       H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
       H5Tinsert(item_type, "val", sizeof(int), H5T_NATIVE_INT);
       if (shape == NULL || (*shape)[0] < 1) {
+      //if (shape.empty() || (*shape)[0] < 1) {
         dbtypes[i] = VL_MAP_INT_INT;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_MAP_INT_INT) == 0) {
@@ -669,8 +685,9 @@ void Hdf5Back::CreateTable(Datum* d) {
        << "  chunksize " << chunk_size << "\n" \
        << "  rowsize   " << dst_size << "\n";
     for (int i = 0; i < nvals; ++i) {
-      ss << "    col #" << i << " " << field_names[i] << " size: " << dst_sizes[i] \
-         << " offset: " << dst_offset[i] << "\n";
+      ss << "    #" << i << " " << field_names[i] << "\n" \
+         << "      size:   " << dst_sizes[i] << "\n"
+         << "      offset: " << dst_offset[i] << "\n";
     }
     throw IOError(ss.str());
   }
@@ -838,14 +855,16 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case VECTOR_STRING: {
           vector<string> val = a->cast<vector<string> >();
           shape = shapes[col];
-          fieldlen = (*shape)[1];
+          //fieldlen = (*shape)[1];
+          fieldlen = shape[1];
           unsigned int cnt = 0;
           for (; cnt < val.size(); ++cnt) {
             valuelen = std::min(val[cnt].size(), fieldlen);
             memcpy(buf + offset + fieldlen*cnt, val[cnt].c_str(), valuelen);
             memset(buf + offset + fieldlen*cnt + valuelen, 0, fieldlen - valuelen);
           }
-          memset(buf + offset + fieldlen*cnt, 0, fieldlen * ((*shape)[0] - cnt));
+          //memset(buf + offset + fieldlen*cnt, 0, fieldlen * ((*shape)[0] - cnt));
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
           break;
         }
         case VECTOR_VL_STRING: {
@@ -862,7 +881,8 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case VL_VECTOR_STRING: {
           shape = shapes[col];
-          size_t strlen =(*shape)[1];
+          //size_t strlen =(*shape)[1];
+          size_t strlen =shape[1];
           vector<string> givenval = a->cast<vector<string> >();
           vector<string> val = vector<string>(givenval.size());
           unsigned int cnt = 0;
