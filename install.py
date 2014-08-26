@@ -59,7 +59,11 @@ def install_cyclus(args):
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
-    make_cmd = ['make']
+    #make_cmd = ['make']
+    make_cmd = ['cmake', '--build', '.', '--config']
+    if args.build_type:
+        make_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
+    make_cmd += ['--']
     if args.threads:
         make_cmd += ['-j' + str(args.threads)]
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
