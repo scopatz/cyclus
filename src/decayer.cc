@@ -49,6 +49,7 @@ void Decayer::AddNucToMaps(int nuc) {
   int i;
   int col;
   int daughter;
+  double br;
   std::set<int> daughters;
   std::set<int>::iterator d;
 
@@ -64,8 +65,12 @@ void Decayer::AddNucToMaps(int nuc) {
   std::vector< std::pair<int, double> > dvec(daughters.size());
   for (d = daughters.begin(); d != daughters.end(); ++d) {
     daughter = *d;
+    br = pyne::branch_ratio(nuc, daughter);
+    if (isnan(br)) {
+      continue;
+    }
     AddNucToMaps(daughter);
-    dvec[i] = std::make_pair(daughter, pyne::branch_ratio(nuc, daughter));
+    dvec[i] = std::make_pair(daughter, br);
     i++;
   }
   daughters_[col] = dvec;
