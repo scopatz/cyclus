@@ -17,6 +17,9 @@ NucList Decayer::nuclides_tracked_ = NucList();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
+  Warn<DEPRECATION_WARNING>(
+      "Decayer is deprecated in favor of pyne::decayers::decay");
+
   int nuc;
   int col;
   long double atom_count;
