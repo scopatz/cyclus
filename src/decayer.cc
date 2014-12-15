@@ -47,6 +47,9 @@ Decayer::Decayer(const CompMap& comp) {
   }
 }
 
+
+Decayer::~Decayer() {}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::AddNucToMaps(int nuc) {
   int i;

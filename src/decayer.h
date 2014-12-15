@@ -31,7 +31,7 @@ class Decayer {
  public:
   Decayer(const CompMap& comp);
 
-  ~Decayer() {};
+  ~Decayer();
 
   /// set the composition from a CompMap
   void GetResult(CompMap& comp);
