@@ -2648,7 +2648,7 @@ bool pyne::nucname::isnuclide(std::string nuc) {
   return isnuclide(n);
 };
 
-bool pyne::nucname::isnuclide(char * nuc) {
+bool pyne::nucname::isnuclide(const char * nuc) {
   return isnuclide(std::string(nuc));
 };
 
@@ -2767,7 +2767,7 @@ int pyne::nucname::id(int nuc) {
   throw IndeterminateNuclideForm(nuc, "");
 };
 
-int pyne::nucname::id(char * nuc) {
+int pyne::nucname::id(const char * nuc) {
   std::string newnuc (nuc);
   return id(newnuc);
 };
@@ -2878,7 +2878,7 @@ bool pyne::nucname::iselement(std::string nuc) {
   return iselement(n);
 };
 
-bool pyne::nucname::iselement(char * nuc) {
+bool pyne::nucname::iselement(const char * nuc) {
   return iselement(std::string(nuc));
 };
 
@@ -2932,7 +2932,7 @@ std::string pyne::nucname::name(int nuc) {
 
 
 
-std::string pyne::nucname::name(char * nuc) {
+std::string pyne::nucname::name(const char * nuc) {
   std::string newnuc (nuc);
   return name(newnuc);
 }
@@ -2950,7 +2950,7 @@ int pyne::nucname::znum(int nuc) {
   return id(nuc) / 10000000;
 };
 
-int pyne::nucname::znum(char * nuc) {
+int pyne::nucname::znum(const char * nuc) {
   return id(nuc) / 10000000;
 };
 
@@ -2965,7 +2965,7 @@ int pyne::nucname::anum(int nuc) {
   return (id(nuc) / 10000) % 1000;
 };
 
-int pyne::nucname::anum(char * nuc) {
+int pyne::nucname::anum(const char * nuc) {
   return (id(nuc) / 10000) % 1000;
 };
 
@@ -2980,7 +2980,7 @@ int pyne::nucname::snum(int nuc) {
   return id(nuc) % 10000;
 };
 
-int pyne::nucname::snum(char * nuc) {
+int pyne::nucname::snum(const char * nuc) {
   return id(nuc) % 10000;
 };
 
@@ -3001,7 +3001,7 @@ int pyne::nucname::zzaaam(int nuc) {
 };
 
 
-int pyne::nucname::zzaaam(char * nuc) {
+int pyne::nucname::zzaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzaaam(newnuc);
 };
@@ -3017,7 +3017,7 @@ int pyne::nucname::zzaaam_to_id(int nuc) {
 };
 
 
-int pyne::nucname::zzaaam_to_id(char * nuc) {
+int pyne::nucname::zzaaam_to_id(const char * nuc) {
   return zzaaam_to_id(std::string(nuc));
 };
 
@@ -3037,7 +3037,7 @@ int pyne::nucname::zzzaaa(int nuc) {
 };
 
 
-int pyne::nucname::zzzaaa(char * nuc) {
+int pyne::nucname::zzzaaa(const char * nuc) {
   std::string newnuc (nuc);
   return zzzaaa(newnuc);
 };
@@ -3053,7 +3053,7 @@ int pyne::nucname::zzzaaa_to_id(int nuc) {
 };
 
 
-int pyne::nucname::zzzaaa_to_id(char * nuc) {
+int pyne::nucname::zzzaaa_to_id(const char * nuc) {
   return zzzaaa_to_id(std::string(nuc));
 };
 
@@ -3094,7 +3094,7 @@ std::string pyne::nucname::zzllaaam(int nuc) {
 };
 
 
-std::string pyne::nucname::zzllaaam(char * nuc) {
+std::string pyne::nucname::zzllaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzllaaam(newnuc);
 };
@@ -3105,7 +3105,7 @@ std::string pyne::nucname::zzllaaam(std::string nuc) {
 };
 
 
-int pyne::nucname::zzllaaam_to_id(char * nuc) {
+int pyne::nucname::zzllaaam_to_id(const char * nuc) {
   return zzllaaam_to_id(std::string(nuc));
 };
 
@@ -3178,7 +3178,7 @@ int pyne::nucname::mcnp(int nuc) {
 
 
 
-int pyne::nucname::mcnp(char * nuc) {
+int pyne::nucname::mcnp(const char * nuc) {
   std::string newnuc (nuc);
   return mcnp(newnuc);
 };
@@ -3219,7 +3219,7 @@ int pyne::nucname::mcnp_to_id(int nuc) {
 };
 
 
-int pyne::nucname::mcnp_to_id(char * nuc) {
+int pyne::nucname::mcnp_to_id(const char * nuc) {
   return mcnp_to_id(std::string(nuc));
 };
 
@@ -3296,7 +3296,7 @@ std::string pyne::nucname::serpent(int nuc) {
 };
 
 
-std::string pyne::nucname::serpent(char * nuc) {
+std::string pyne::nucname::serpent(const char * nuc) {
   std::string newnuc (nuc);
   return serpent(newnuc);
 };
@@ -3315,7 +3315,7 @@ std::string pyne::nucname::serpent(std::string nuc) {
 //};
 
 
-int pyne::nucname::serpent_to_id(char * nuc) {
+int pyne::nucname::serpent_to_id(const char * nuc) {
   return serpent_to_id(std::string(nuc));
 };
 
@@ -3399,7 +3399,7 @@ std::string pyne::nucname::nist(int nuc) {
 };
 
 
-std::string pyne::nucname::nist(char * nuc) {
+std::string pyne::nucname::nist(const char * nuc) {
   std::string newnuc (nuc);
   return nist(newnuc);
 };
@@ -3418,7 +3418,7 @@ std::string pyne::nucname::nist(std::string nuc) {
 // NON-EXISTANT
 //};
 
-int pyne::nucname::nist_to_id(char * nuc) {
+int pyne::nucname::nist_to_id(const char * nuc) {
   return nist_to_id(std::string(nuc));
 };
 
@@ -3469,7 +3469,7 @@ int pyne::nucname::cinder(int nuc) {
 
 
 
-int pyne::nucname::cinder(char * nuc) {
+int pyne::nucname::cinder(const char * nuc) {
   std::string newnuc (nuc);
   return cinder(newnuc);
 };
@@ -3492,7 +3492,7 @@ int pyne::nucname::cinder_to_id(int nuc) {
 };
 
 
-int pyne::nucname::cinder_to_id(char * nuc) {
+int pyne::nucname::cinder_to_id(const char * nuc) {
   return cinder_to_id(std::string(nuc));
 };
 
@@ -3539,7 +3539,7 @@ std::string pyne::nucname::alara(int nuc) {
 };
 
 
-std::string pyne::nucname::alara(char * nuc) {
+std::string pyne::nucname::alara(const char * nuc) {
   std::string newnuc (nuc);
   return alara(newnuc);
 }
@@ -3559,7 +3559,7 @@ std::string pyne::nucname::alara(std::string nuc) {
 //};
 
 
-int pyne::nucname::alara_to_id(char * nuc) {
+int pyne::nucname::alara_to_id(const char * nuc) {
   return alara_to_id(std::string(nuc));
 };
 
@@ -3607,7 +3607,7 @@ int pyne::nucname::sza(int nuc) {
 }
 
 
-int pyne::nucname::sza(char * nuc) {
+int pyne::nucname::sza(const char * nuc) {
   std::string newnuc (nuc);
   return sza(newnuc);
 }
@@ -3629,7 +3629,7 @@ int pyne::nucname::sza_to_id(int nuc) {
 }
 
 
-int pyne::nucname::sza_to_id(char * nuc) {
+int pyne::nucname::sza_to_id(const char * nuc) {
   std::string newnuc (nuc);
   return sza_to_id(newnuc);
 }
@@ -6601,6 +6601,7 @@ const double pyne::barns_per_cm2 = 1e24;
 const double pyne::cm2_per_barn = 1e-24;
 const double pyne::sec_per_day = 24.0 * 3600.0;
 const double pyne::MeV_per_K = 8.617343e-11;
+const double pyne::MeV_per_MJ = 1.60217657e-19;
 
 /********************************/
 /*** data_checksums Functions ***/
@@ -13259,7 +13260,6 @@ CustomWriter::unindent()
 
 #ifndef PYNE_IS_AMALGAMATED
 #include "material.h"
-#include "nucname.h"
 #endif
 
 // h5wrap template
@@ -13620,14 +13620,6 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
     H5Pset_chunk(data_set_params, 1, chunk_dims);
     H5Pset_deflate(data_set_params, 1);
 
-    material_data * data_fill_value  = new material_data[material_data_size];
-    (*data_fill_value).mass = -1.0;
-    (*data_fill_value).density= -1.0;
-    (*data_fill_value).atoms_per_mol = -1.0;
-    for (int n = 0; n != nuc_size; n++)
-      (*data_fill_value).comp[n] = 0.0;
-    H5Pset_fill_value(data_set_params, desc, &data_fill_value);
-
     // Create the data set
     data_set = H5Dcreate2(db, datapath.c_str(), desc, data_space, H5P_DEFAULT,
                             data_set_params, H5P_DEFAULT);
@@ -13641,9 +13633,6 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
                                 H5P_DEFAULT, H5P_DEFAULT);
     H5Awrite(nuc_attr, nuc_attr_type, nucpath.c_str());
     H5Fflush(db, H5F_SCOPE_GLOBAL);
-
-    // Remember to de-allocate
-    delete[] data_fill_value;
   };
 
   // Get the data hyperslab
@@ -14341,6 +14330,29 @@ pyne::comp_map pyne::Material::mult_by_mass() {
 
 
 
+pyne::comp_map pyne::Material::activity() {
+  pyne::comp_map act;
+  double masspermole = mass * pyne::N_A;
+  for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+    act[i->first] = masspermole * (i->second) * decay_const(i->first) / atomic_mass(i->first);
+  }
+  return act;
+}	
+
+
+pyne::comp_map pyne::Material::decay_heat() {
+  pyne::comp_map dh;
+  double masspermole = mass * pyne::N_A;
+  for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+    dh[i->first] = pyne::MeV_per_MJ * masspermole * (i->second) * \
+                   decay_const(i->first) * q_val(i->first) / \
+                   atomic_mass(i->first);
+  }
+  return dh;
+}
+
+
+
 double pyne::Material::molecular_mass(double apm) {
   // Calculate the atomic weight of the Material
   double inverseA = 0.0;
@@ -14787,6 +14799,15 @@ std::vector<std::pair<double, double> > unnormed) {
   }
   return normed;
 }
+
+
+pyne::Material pyne::Material::decay(double t) {
+  Material rtn;
+  comp_map out = pyne::decayers::decay(to_atom_frac(), t);
+  rtn.from_atom_frac(out);
+  rtn.mass = mass * rtn.molecular_mass() / molecular_mass();
+  return rtn;
+};
 
 
 pyne::Material pyne::Material::operator+ (double y) {
