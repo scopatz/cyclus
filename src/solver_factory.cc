@@ -36,7 +36,7 @@ ObjValueHandler::ObjValueHandler(double obj)
   : obj_(obj),
     time_(0),
     found_(false) { };
-    
+
 ObjValueHandler::~ObjValueHandler() { };
 
 ObjValueHandler::ObjValueHandler(const ObjValueHandler& other): CbcEventHandler(other) {
@@ -44,7 +44,7 @@ ObjValueHandler::ObjValueHandler(const ObjValueHandler& other): CbcEventHandler(
   time_ = other.time();
   found_ = other.found();
 }
-  
+
 ObjValueHandler& ObjValueHandler::operator=(const ObjValueHandler& other) {
   if (this != &other) {
     obj_ = other.obj();
@@ -54,9 +54,12 @@ ObjValueHandler& ObjValueHandler::operator=(const ObjValueHandler& other) {
   }
   return *this;
 }
-  
-CbcEventHandler* ObjValueHandler::clone() {
-  return new ObjValueHandler(*this);
+
+CbcEventHandler* ObjValueHandler::clone() const {
+  std::cout << "cloning\n";
+  CbcEventHandler* c_lone = new ObjValueHandler(*this);
+  std::cout << "cloned\n";
+  return c_lone;
 }
 
 CbcEventHandler::CbcAction ObjValueHandler::event(CbcEvent e) {
@@ -124,12 +127,19 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     ReportProg(si);
 
   if (HasInt(si)) {
-    const char *argv[] = {"exchng", "-log", "0", "-solve","-quit"};
-    int argc = 3;
+    const char *argv[] = {"exchng", "-log", "0", "-solve", "-quit"};
+    //int argc = 3;
+    int argc = 5;
     CbcModel model(*si);
-    ObjValueHandler handler(greedy_obj);
+    const ObjValueHandler handler(greedy_obj);
     CbcMain0(model);
+    std::cout << std::string("si ") << (si) << "\n";
+    std::cout << std::string("greedy_obj ") << (greedy_obj) << "\n";
+    std::cout << std::string("verbose ") << (verbose) << "\n";
+    std::cout << std::string("handler ") << (&handler) << "\n";
+    std::cout << std::string("curr handler ") << (model.getEventHandler()) << "\n";
     model.passInEventHandler(&handler);
+    std::cout << std::string("curr handler ") << (model.getEventHandler()) << "\n";
     CbcMain1(argc, argv, model, CbcCallBack);
     si->setColSolution(model.getColSolution());
     if (verbose) {
@@ -138,10 +148,10 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
                 << " and found " << std::boolalpha << handler.found() << "\n";
     }
   } else {
-    // no ints, just solve 'initial lp relaxation' 
+    // no ints, just solve 'initial lp relaxation'
     si->initialSolve();
   }
-  
+
   if (verbose) {
     const double* soln = si->getColSolution();
     for (int i = 0; i != si->getNumCols(); i ++) {

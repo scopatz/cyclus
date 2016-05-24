@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <iostream>
+
 #include "CoinMessageHandler.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "CoinPackedVector.hpp"
@@ -126,18 +128,31 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
 }
 
 TEST_F(SolverFactoryTests, Cbc) {
+  std::cout << "t0\n";
   sf_.solver_t("cbc");
+  std::cout << "t1\n";
   OsiSolverInterface* si = sf_.get();
+  std::cout << "t2\n";
   CoinMessageHandler h;
+  std::cout << "t3\n";
   h.setLogLevel(0);
+  std::cout << "t4\n";
   si->passInMessageHandler(&h);
+  std::cout << "t5\n";
   Init(si);
+  std::cout << "t6\n";
   si->setInteger(1);  // y
+  std::cout << "t7\n";
   si->setInteger(2);  // z
+  std::cout << "t8\n";
   SolveProg(si);
+  std::cout << "t9\n";
   const double* exp = &mip_exp_[0];
+  std::cout << "t10\n";
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
+  std::cout << "t11\n";
   EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());
+  std::cout << "t12\n";
 }
 
 TEST_F(SolverFactoryTests, CbcRedundant) {
