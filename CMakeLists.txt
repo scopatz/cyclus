@@ -238,6 +238,13 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
     ENDIF(ICUUC_LIBRARIES)
 
+    # lzma
+    FIND_LIBRARY(LZMA_LIBRARIES lzma)
+    MESSAGE("-- Found LZMA Libraries (optional): ${LZMA_LIBRARIES}")
+    IF(LZMA_LIBRARIES)
+        set(LIBS ${LIBS} ${LZMA_LIBRARIES})
+    ENDIF(LZMA_LIBRARIES)
+
     ##############################################################################################
     #################################### end find libraries ######################################
     ##############################################################################################
