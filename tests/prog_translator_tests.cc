@@ -18,11 +18,12 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ProgTranslatorTests, translation) {
-  // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
+  //Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
   SolverFactory sf("cbc");
   OsiSolverInterface* iface = sf.get();
   CoinMessageHandler h;
-  h.setLogLevel(0);
+  //h.setLogLevel(0);
+  h.setLogLevel(2);
   iface->passInMessageHandler(&h);
   double inf = iface->getInfinity();
 
@@ -59,7 +60,7 @@ TEST(ProgTranslatorTests, translation) {
                          excl_flow[i] / prefs[i] : 1 / prefs[i]);
   }
 
-  
+
   double cost_add = 1;
   double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
   double min_row_coeff = 0.3;  // ucaps_a_3
@@ -147,9 +148,12 @@ TEST(ProgTranslatorTests, translation) {
   g.AddArc(x3);
   g.AddArc(x4);
 
+  std::cout << "A\n";
   bool excl = true;
   ProgTranslator pt(&g, iface, excl, max_cost);
+  std::cout << "B\n";
   ASSERT_NO_THROW(pt.Translate());
+  std::cout << "C\n";
 
   // test non-coin xlate members
   double col_lbs[] = {0, 0, 0, 0, 0, 0, 0};
@@ -167,77 +171,114 @@ TEST(ProgTranslatorTests, translation) {
   }
 
   // test coin xlate members
+  std::cout << "D\n";
   CoinPackedMatrix m(false, 0, 0);
+  std::cout << "E\n";
   m.setDimensions(0, narcs + nfaux);
+  std::cout << "F\n";
 
   int row_ind_0[] = {0, 1, 2};
   double row_val_0[] = {ucaps_c_0[0],
                         ucaps_c_1[0] * excl_flow[1],
                         ucaps_c_2[0] * excl_flow[2]};
+  std::cout << "G\n";
   m.appendRow(3, row_ind_0, row_val_0);
+  std::cout << "H\n";
 
   int row_ind_1[] = {3, 4};
   double row_val_1[] = {ucaps_d_3[0],
                         ucaps_d_4[0] * excl_flow[4]};
+  std::cout << "I\n";
   m.appendRow(2, row_ind_1, row_val_1);
+  std::cout << "J\n";
 
   int row_ind_2[] = {3, 4};
   double row_val_2[] = {ucaps_d_3[1],
                         ucaps_d_4[1] * excl_flow[4]};
+  std::cout << "K\n";
   m.appendRow(2, row_ind_2, row_val_2);
+  std::cout << "L\n";
 
   int row_ind_3[] = {0, 3, 5};
   double row_val_3[] = {ucaps_a_0[0], ucaps_a_3[0], 1};
+  std::cout << "M\n";
   m.appendRow(3, row_ind_3, row_val_3);
+  std::cout << "N\n";
 
   int row_ind_4[] = {0, 3, 5};
   double row_val_4[] = {ucaps_a_0[1], ucaps_a_3[1], 1};
+  std::cout << "O\n";
   m.appendRow(3, row_ind_4, row_val_4);
+  std::cout << "P\n";
 
   int row_ind_5[] = {1, 2, 4, 6};
   double row_val_5[] = {ucaps_b_1[0] * excl_flow[1],
                         ucaps_b_2[0] * excl_flow[2],
                         ucaps_b_4[0] * excl_flow[4],
                         1};
+  std::cout << "Q\n";
   m.appendRow(4, row_ind_5, row_val_5);
+  std::cout << "R\n";
 
   int row_ind_6[] = {1};
   double row_val_6[] = {1};
+  std::cout << "S\n";
   m.appendRow(1, row_ind_6, row_val_6);
+  std::cout << "T\n";
 
   int row_ind_7[] = {2, 4};
   double row_val_7[] = {1, 1};
+  std::cout << "U\n";
   m.appendRow(2, row_ind_7, row_val_7);
+  std::cout << "V\n";
 
   EXPECT_TRUE(m.isEquivalent2(pt.ctx().m));
+  std::cout << "W\n";
 
   // test population
+  std::cout << "X\n";
   EXPECT_NO_THROW(pt.Populate());
+  std::cout << "Y\n";
 
   for (int i = 0; i != nexcl; i++) {
     EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
+  std::cout << "Z\n";
   }
 
   // verify problem instance
+  std::cout << "a\n";
   OsiClpSolverInterface checkface;
   checkface.loadProblem(m, &col_lbs[0], &col_ubs[0],
                         &obj_coeffs[0], &row_lbs[0], &row_ubs[0]);
+  std::cout << "b\n";
   for (int i = 0; i != nexcl; i++) {
     checkface.setInteger(excl_arcs[i]);
+  std::cout << "c\n";
   }
   EXPECT_EQ(0, differentAgent(*iface, checkface));
+  std::cout << "d\n";
   differentAgent(*iface, checkface);
+  std::cout << "e\n";
 
   checkface.passInMessageHandler(&h);
+  std::cout << "f\n";
   checkface.setObjSense(1.0);
+  std::cout << "g\n";
   checkface.initialSolve();
+  std::cout << "h\n";
   checkface.branchAndBound();
+  std::cout << "i\n";
 
   // verify solution
-  EXPECT_NO_THROW(SolveProg(iface));
+  //EXPECT_NO_THROW(SolveProg(iface));
+  SolveProg(iface);
+  std::cout << "j\n";
   const double* soln = iface->getColSolution();
+  std::cout << "k\n";
   const double* check = checkface.getColSolution();
+  std::cout << "l\n";
   array_double_eq(soln, check, narcs + nfaux, "soln");
+  std::cout << "m\n";
 
   // validate solution
   double x1_flow = excl_flow[1];
@@ -253,6 +294,7 @@ TEST(ProgTranslatorTests, translation) {
                    ucaps_b_1[0] * excl_flow[1] -
                    ucaps_b_2[0] * excl_flow[2];  // 0.6;
 
+  std::cout << "n\n";
   EXPECT_DOUBLE_EQ(soln[0], x0_flow);
   EXPECT_EQ(soln[1], 1);
   EXPECT_EQ(soln[2], 1);
@@ -260,17 +302,21 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_EQ(soln[4], 0);
   EXPECT_DOUBLE_EQ(soln[5], 0);
   EXPECT_DOUBLE_EQ(soln[6], x6_flow);
+  std::cout << "o\n";
 
   // check back translation
   ASSERT_NO_THROW(pt.FromProg());
+  std::cout << "p\n";
   const std::vector<Match>& matches = g.matches();
   ASSERT_EQ(4, matches.size());
   pair_double_eq(matches[0], std::pair<Arc, double>(x0, x0_flow));
   pair_double_eq(matches[1], std::pair<Arc, double>(x1, x1_flow));
   pair_double_eq(matches[2], std::pair<Arc, double>(x2, x2_flow));
   pair_double_eq(matches[3], std::pair<Arc, double>(x3, x3_flow));
+  std::cout << "q\n";
 
   delete iface;
+  std::cout << "r\n";
 }
 
 }  // namespace cyclus

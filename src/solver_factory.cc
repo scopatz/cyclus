@@ -3,10 +3,11 @@
 #include <iostream>
 
 #include "OsiClpSolverInterface.hpp"
-#include "OsiCbcSolverInterface.hpp"
 #include "CbcSolver.hpp"
 #include "CoinTime.hpp"
 
+#include "CbcModel.hpp"
+#include "OsiCbcSolverInterface.hpp"
 #include "error.h"
 
 namespace cyclus {
@@ -124,19 +125,31 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     ReportProg(si);
 
   if (HasInt(si)) {
+    std::cout << "sf1\n";
     const char *argv[] = {"exchng", "-log", "0", "-solve", "-quit"};
+    std::cout << "sf2\n";
     int argc = 5;
+    std::cout << "sf3\n";
     CbcModel model(*si);
+    std::cout << "sf4\n";
     ObjValueHandler handler(greedy_obj);
+    std::cout << "sf5\n";
     CbcMain0(model);
+    std::cout << "sf6\n";
     model.passInEventHandler(&handler);
+    std::cout << "sf7\n";
     CbcMain1(argc, argv, model, CbcCallBack);
+    std::cout << "sf8\n";
     si->setColSolution(model.getColSolution());
+    std::cout << "sf9\n";
     if (verbose) {
+      std::cout << "sf10\n";
       std::cout << "Greedy equivalent time: " << handler.time()
                 << " and obj " << handler.obj()
                 << " and found " << std::boolalpha << handler.found() << "\n";
+      std::cout << "sf11\n";
     }
+    std::cout << "sf13\n";
   } else {
     // no ints, just solve 'initial lp relaxation'
     si->initialSolve();
