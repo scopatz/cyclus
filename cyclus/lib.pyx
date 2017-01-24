@@ -1274,6 +1274,7 @@ cdef class _Agent:
     def id(self):
         """The agent instance's unique ID within a simulation."""
         return (<cpp_cyclus.Agent*> self.ptx).id()
+        #return (<cpp_cyclus.Ider*> self.ptx).id()
 
     def __hash__(self):
         return self.id

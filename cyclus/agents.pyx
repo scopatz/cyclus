@@ -485,12 +485,12 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    #int id():
-    #    return this.id_
-
     std_string schema():
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
+
+    #std_string kind():
+    #    return std_string(b'Facility')
 
     cpp_jsoncpp.Value annotations():
         pyanno = (<object> this.self).annotations_json

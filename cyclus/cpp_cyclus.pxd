@@ -646,7 +646,7 @@ cdef extern from "agent.h" namespace "cyclus":
         void prototype(std_string)
         std_string spec()
         void spec(std_string)
-        const std_string kind()
+        std_string kind()
         Context* context()
         std_string str()
         Agent* parent()
