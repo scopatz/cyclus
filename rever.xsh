@@ -7,31 +7,32 @@ from xonsh.tools import print_color
 from rever.activity import activity
 
 
-$ACTIVITIES = ['version_bump', 'pyne', 'nuc_data_make']
+$ACTIVITIES = ['version_bump', 'pyne', 'nuc_data_make', 'gtest']
 
 $VERSION_BUMP_PATTERNS = [
     ('cyclus/__init__.py', '__version__\s*=.*', "__version__ = '$VERSION'"),
     ]
 
 
-def ensure_pyne():
-    """Makes sure that the pyne dir is present and up-to-date for rever"""
-    pyne_dir = os.path.join($REVER_DIR, 'pyne')
-    if os.path.isdir(pyne_dir):
+def ensure_repo(url, targ):
+    """Makes sure that a repo dir is present and up-to-date for rever"""
+    targ_dir = os.path.join($REVER_DIR, targ)
+    if os.path.isdir(targ_dir):
         cwd = $PWD
-        cd @(pyne_dir)
+        cd @(targ_dir)
         git checkout -- .
         git pull
         cd @(cwd)
     else:
-        git clone --depth=1 https://github.com/pyne/pyne.git $REVER_DIR/pyne
+        git clone --depth=1 @(url) @(targ_dir)
+    return targ_dir
 
 
 @activity
 def pyne():
     """Updates PyNE files."""
     # get pyne
-    ensure_pyne()
+    ensure_repo('https://github.com/pyne/pyne.git', 'pyne')
     cwd = $PWD
     # amalgamate
     cd $REVER_DIR/pyne
@@ -73,3 +74,19 @@ def nuc_data_make():
 def nuc_data_make():
     print_color('{RED}Cannot un-upload cyclus_nuc_data.h5{NO_COLOR}')
 
+
+#
+# GTEST Update
+#
+@activity
+def gtest():
+    """Updates google test files."""
+    # get pyne
+    repo = ensure_repo('https://github.com/google/googletest.git', 'googletest')
+    cwd = $PWD
+    # amalgamate
+    cd @(repo + 'googletest/scripts')
+    ./fuse_gtest_files.py @(cwd + 'tests/GoogleTest')
+    cd @(cwd)
+    git add tests/GoogleTest
+    git commit -am "Updated google tests for $VERSION"
