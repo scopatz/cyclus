@@ -20,6 +20,7 @@ suffix.h
 #*
 *.zip
 *.tex
+rever/
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
 stubs/stub_version.h
