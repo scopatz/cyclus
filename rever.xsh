@@ -7,12 +7,13 @@ from xonsh.tools import print_color
 from rever.activity import activity
 
 
-$ACTIVITIES = ['version_bump', 'pyne', 'nuc_data_make', 'gtest']
+$ACTIVITIES = ['version_bump', 'pyne', 'nuc_data_make', 'gtest', 'tag']
 
 $VERSION_BUMP_PATTERNS = [
     ('cyclus/__init__.py', '__version__\s*=.*', "__version__ = '$VERSION'"),
     ]
-
+$TAG_REMOTE = 'git@github.com:cyclus/cyclus.git'
+$TAG_PUSH = False
 
 def ensure_repo(url, targ):
     """Makes sure that a repo dir is present and up-to-date for rever"""
@@ -58,6 +59,9 @@ def push_rackspace(fname, cred_file='rs.cred'):
 @activity
 def nuc_data_make():
     """Makes nuclear data for cyclus"""
+    if not os.path.isfile('rs.cred'):
+        raise RuntimeError('No rackspace creditial file "rs.cred". Please place this file '
+                           'in the root directory of this repository. Never commit this file!')
     nuc_data_make -o $REVER_DIR/cyclus_nuc_data.h5 \
         -m atomic_mass,scattering_lengths,decay,simple_xs,materials,eaf,wimsd_fpy,nds_fpy
     # setup pyrax
