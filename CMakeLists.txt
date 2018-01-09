@@ -10,6 +10,9 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
 
+# Set some policies
+cmake_policy(SET CMP0040 OLD)
+
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
@@ -23,8 +26,8 @@ ELSE()
 ENDIF()
 
 # enable assembly
-find_program(YASM_EXE NAMES yasm)
-enable_language(ASM)
+#find_program(YASM_EXE NAMES yasm)
+#enable_language(ASM)
 
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
@@ -401,7 +404,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
+    #ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)
