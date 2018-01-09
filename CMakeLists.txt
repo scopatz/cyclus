@@ -12,6 +12,7 @@ ENDIF()
 
 # Set some policies
 cmake_policy(SET CMP0040 OLD)
+cmake_policy(SET CMP0042 OLD)
 
 # This project name is cyclus.
 PROJECT(CYCLUS)
