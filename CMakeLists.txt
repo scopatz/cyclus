@@ -23,6 +23,7 @@ ELSE()
 ENDIF()
 
 # enable assembly
+find_program(YASM_EXE NAMES yasm)
 enable_language(ASM)
 
 # quiets fortify_source warnings when not compiling with optimizations
@@ -154,6 +155,19 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
+
+    # enable assembly
+    if (APPLE)
+      find_program(YASM_EXECUTABLE NAMES yasm ${DEPS_HINTS} ${DEPS_BIN_HINTS})
+      if (YASM_EXECUTABLE)
+        # must be set before enable_language(ASM)
+        set(CMAKE_ASM_COMPILER "${YASM_EXECUTABLE}")
+        message(STATUS "Found yasm: ${YASM_EXECUTABLE}")
+      else()
+        message(STATUS "Did not find yasm.")
+      endif()
+    endif()
+    enable_language(ASM)
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
